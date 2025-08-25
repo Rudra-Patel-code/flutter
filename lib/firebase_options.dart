@@ -33,10 +33,7 @@ class DefaultFirebaseOptions {
           'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -65,6 +62,16 @@ class DefaultFirebaseOptions {
     messagingSenderId: '720143189830',
     projectId: 'rdp-todo-list-55101',
     storageBucket: 'rdp-todo-list-55101.firebasestorage.app',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyBFo_8MvcSEPodtqtIXMHt6o8uOtBj3bV0',
+    appId: '1:720143189830:web:22412bb35d50d4a0c5c747',
+    messagingSenderId: '720143189830',
+    projectId: 'rdp-todo-list-55101',
+    authDomain: 'rdp-todo-list-55101.firebaseapp.com',
+    storageBucket: 'rdp-todo-list-55101.firebasestorage.app',
+    measurementId: 'G-K1WHHQMJH8',
   );
 
 }
