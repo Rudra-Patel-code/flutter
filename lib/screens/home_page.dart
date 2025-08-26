@@ -31,6 +31,29 @@ class TaskService {
         .map((doc) => Task.fromMap(doc.id, doc.data()))
         .toList();
   }
+
+  // create the task
+  Future<String> addTask(String name) async {
+    final newTask = {
+      'name': name,
+      'completed': false,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+
+    final docRef = await db.collection('tasks').add(newTask);
+
+    return docRef.id;
+  }
+
+  // update the task future
+  Future<void> updateTask(String id, bool completed) async {
+    await db.collection('tasks').doc(id).update({'completed': completed});
+  }
+
+  // delete the tasks form the database
+  Future<void> deleteTasks(String id) async {
+    await db.collection('tasks').doc(id).delete();
+  }
 }
 
 // create a task provider to manange state
