@@ -1,63 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-class Task {
-  final String id;
-  final String name;
-  final bool completed;
-
-  Task({required this.id, required this.name, required this.completed});
-
-  factory Task.fromMap(String id, Map<String, dynamic> data) {
-    return Task(
-      id: id,
-      name: data["name"] ?? "",
-      completed: data["completed"] ?? false,
-    );
-  }
-}
-
-// define a task service to handle firestore operations
-class TaskService {
-  // firestore instnace in a alias
-  final FirebaseFirestore db = FirebaseFirestore.instance;
-  // future returns a list of tasks using factory method defined in task class
-  Future<List<Task>> fetchTask() async {
-    // call get to retreve all of the documents inside the collections
-    final snapshot = await db.collection('tasks').orderBy('timestamp').get();
-
-    // snapshot of all documents is being mapped to factory object template
-    return snapshot.docs
-        .map((doc) => Task.fromMap(doc.id, doc.data()))
-        .toList();
-  }
-
-  // create the task
-  Future<String> addTask(String name) async {
-    final newTask = {
-      'name': name,
-      'completed': false,
-      'timestamp': FieldValue.serverTimestamp(),
-    };
-
-    final docRef = await db.collection('tasks').add(newTask);
-
-    return docRef.id;
-  }
-
-  // update the task future
-  Future<void> updateTask(String id, bool completed) async {
-    await db.collection('tasks').doc(id).update({'completed': completed});
-  }
-
-  // delete the tasks form the database
-  Future<void> deleteTasks(String id) async {
-    await db.collection('tasks').doc(id).delete();
-  }
-}
-
-// create a task provider to manange state
-class TaskProvider extends ChangeNotifier {}
+import 'package:myapp/providers/task_providers.dart';
+import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 class Home_Page extends StatefulWidget {
   const Home_Page({super.key});
@@ -67,8 +11,80 @@ class Home_Page extends StatefulWidget {
 }
 
 class _Home_PageState extends State<Home_Page> {
+  final TextEditingController nameCOntroller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<TaskProvider>(context, listen: false).loadTasks();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Expanded(child: Image.asset('assets/rdplogo.png', height: 80)),
+            const Text(
+              'Daily Planner',
+              style: TextStyle(
+                fontFamily: 'Caveat',
+                fontSize: 32,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+      body: Column(
+        children: [
+          TableCalendar(
+            calendarFormat: CalendarFormat.month,
+            focusedDay: DateTime.now(),
+            firstDay: DateTime(2025),
+            lastDay: DateTime(2026),
+          ),
+          Consumer<TaskProvider>(
+            builder: (context, taskProvider, child) {
+              return buildAddTaskSection(nameCOntroller, () async {
+                await taskProvider.addTask(nameCOntroller.text);
+                nameCOntroller.clear();
+              });
+            },
+          ),
+        ],
+      ),
+      drawer: Drawer(),
+    );
   }
+}
+
+// Build the section for adding tasks
+
+Widget buildAddTaskSection(nameController, addTask) {
+  return Container(
+    decoration: BoxDecoration(color: Colors.white),
+    child: Row(
+      children: [
+        Expanded(
+          child: Container(
+            child: TextField(
+              maxLength: 32,
+              controller: nameController,
+              decoration: const InputDecoration(
+                labelText: "Add Task",
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ),
+        ),
+        ElevatedButton(onPressed: addTask, child: Text('Add Task')),
+      ],
+    ),
+  );
 }
