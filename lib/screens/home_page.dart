@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/models/tasks.dart';
 import 'package:myapp/providers/task_providers.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -86,5 +87,18 @@ Widget buildAddTaskSection(nameController, addTask) {
         ElevatedButton(onPressed: addTask, child: Text('Add Task')),
       ],
     ),
+  );
+}
+
+Widget buildTaksItem(
+  List<Task> tasks,
+  Function(int) removeTasks,
+  Function(int, bool) updateTask,
+) {
+  return ListView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: tasks.length,
+    itemBuilder: (context, index) {},
   );
 }
