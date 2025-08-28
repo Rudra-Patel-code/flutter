@@ -44,11 +44,24 @@ class _Home_PageState extends State<Home_Page> {
       ),
       body: Column(
         children: [
-          TableCalendar(
-            calendarFormat: CalendarFormat.month,
-            focusedDay: DateTime.now(),
-            firstDay: DateTime(2025),
-            lastDay: DateTime(2026),
+          Expanded(
+            child: SingleChildScrollView(
+              child: TableCalendar(
+                calendarFormat: CalendarFormat.month,
+                focusedDay: DateTime.now(),
+                firstDay: DateTime(2025),
+                lastDay: DateTime(2026),
+              ),
+            ),
+          ),
+          Consumer<TaskProvider>(
+            builder: (context, taskProvider, child) {
+              return buildTaksItem(
+                taskProvider.tasks,
+                taskProvider.removeTask,
+                taskProvider.updateTask,
+              );
+            },
           ),
           Consumer<TaskProvider>(
             builder: (context, taskProvider, child) {
@@ -99,6 +112,42 @@ Widget buildTaksItem(
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
     itemCount: tasks.length,
-    itemBuilder: (context, index) {},
+    itemBuilder: (context, index) {
+      final task = tasks[index];
+      final isEven = index % 2 == 0;
+
+      return Padding(
+        padding: const EdgeInsets.all(1.0),
+        child: ListTile(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          tileColor: isEven ? Colors.blue : Colors.green,
+          leading: Icon(
+            task.completed ? Icons.check_circle : Icons.circle_outlined,
+          ),
+          title: Text(
+            task.name,
+            style: TextStyle(
+              decoration: task.completed ? TextDecoration.lineThrough : null,
+              fontSize: 22,
+            ),
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Checkbox(
+                value: task.completed,
+                onChanged: (value) => {updateTask(index, value!)},
+              ),
+              IconButton(
+                onPressed: () => removeTasks(index),
+                icon: Icon(Icons.delete),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
   );
 }
