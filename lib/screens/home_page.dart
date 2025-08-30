@@ -12,6 +12,7 @@ class Home_Page extends StatefulWidget {
 }
 
 class _Home_PageState extends State<Home_Page> {
+  // input controller for the add task button
   final TextEditingController nameCOntroller = TextEditingController();
 
   @override
@@ -22,6 +23,7 @@ class _Home_PageState extends State<Home_Page> {
     });
   }
 
+  // ui components to display in the screen
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,6 +46,7 @@ class _Home_PageState extends State<Home_Page> {
       ),
       body: Column(
         children: [
+          // scrollable to avoid overflow
           Expanded(
             child: SingleChildScrollView(
               child: TableCalendar(
@@ -54,6 +57,7 @@ class _Home_PageState extends State<Home_Page> {
               ),
             ),
           ),
+          // list all the tasks
           Consumer<TaskProvider>(
             builder: (context, taskProvider, child) {
               return buildTaksItem(
@@ -63,6 +67,7 @@ class _Home_PageState extends State<Home_Page> {
               );
             },
           ),
+          // addin task section
           Consumer<TaskProvider>(
             builder: (context, taskProvider, child) {
               return buildAddTaskSection(nameCOntroller, () async {
@@ -79,12 +84,12 @@ class _Home_PageState extends State<Home_Page> {
 }
 
 // Build the section for adding tasks
-
 Widget buildAddTaskSection(nameController, addTask) {
   return Container(
     decoration: BoxDecoration(color: Colors.white),
     child: Row(
       children: [
+        // input field for adding tasks
         Expanded(
           child: Container(
             child: TextField(
@@ -97,11 +102,14 @@ Widget buildAddTaskSection(nameController, addTask) {
             ),
           ),
         ),
+        // button to submit button
         ElevatedButton(onPressed: addTask, child: Text('Add Task')),
       ],
     ),
   );
 }
+
+// widget to render the list of tasks
 
 Widget buildTaksItem(
   List<Task> tasks,
@@ -122,18 +130,23 @@ Widget buildTaksItem(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
+          // alternate bg color for tasks list
           tileColor: isEven ? Colors.blue : Colors.green,
+          // conditional to render the checked button if task is completed
           leading: Icon(
             task.completed ? Icons.check_circle : Icons.circle_outlined,
           ),
           title: Text(
             task.name,
+
+            // conditional to render the line through if the task is completed
             style: TextStyle(
               decoration: task.completed ? TextDecoration.lineThrough : null,
               fontSize: 22,
             ),
           ),
           trailing: Row(
+            // added to avoid the overflow
             mainAxisSize: MainAxisSize.min,
             children: [
               Checkbox(
